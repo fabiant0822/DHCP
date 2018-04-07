@@ -74,7 +74,11 @@ public class DHCP {
             while (be.hasNextLine()) {
                 String sor[] = be.nextLine().split(";");
                 if (sor[0].equals("request"))
-                    request(sor[1]); 
+                    try {
+                    request(sor[1]);
+                    } catch (Kivetel ex) {
+                        System.out.println(ex.getMessage());
+                    }
                 else if (sor[0].equals("release"))
                     release(sor[1]);
             }
@@ -112,7 +116,7 @@ public class DHCP {
         dhcp.put(mac, ip);
     }
     
-    static private void request (String mac) {
+    static private void request (String mac) throws Kivetel {
         if (dhcp.get(mac) != null)
             return;
         String ip = reserved.get(mac);
@@ -126,7 +130,14 @@ public class DHCP {
                 return;
             }
         }
-        System.out.println("Nem sikerült az IP cím kiosztása!");
+        throw new Kivetel ("Nem sikerült az IP cím kiosztása!");
+    }
+}
+
+// kivételkezelés saját osztályból
+class Kivetel extends Exception {
+    public Kivetel (String uzenet) {
+        super (uzenet);
     }
 }
 
